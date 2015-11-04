@@ -71,7 +71,7 @@ public class ParallelGameOfLife implements GameOfLife {
 		bordersInitialize();
 		
 		//prepare data for spawn
-		
+		//TEST
 		
 		
 		//spawn
