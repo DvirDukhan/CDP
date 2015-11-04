@@ -14,12 +14,12 @@ public class Coordinate {
 	/**
 	 *  x value of the coordinate.
 	 */
-	private int x;
+	int x;
 	
 	/**
 	 * y value of the coordinate.
 	 */
-	private int y;
+	int y;
 	
 	
 	/**
@@ -35,7 +35,23 @@ public class Coordinate {
 		y = inputY;
 	}
 	
+	/**
+	 * 
+	 * @return The x value of the coordinate.
+	 */
+	public int getX()
+	{
+		return x;
+	}
 	
+	/**
+	 * 
+	 * @return The y value of the coordinate.
+	 */
+	public int getY()
+	{
+		return y;
+	}
 	
 	/**
 	 *  returns the value in the format of 

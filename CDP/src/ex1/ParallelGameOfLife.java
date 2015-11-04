@@ -83,16 +83,19 @@ public class ParallelGameOfLife implements GameOfLife {
 		return null;
 	}
 	
-	
+	/**
+	 * This function will create the borders of the board, since parallel initialization is risky due to null objects
+	 */
 	public void bordersInitialize()
 	{
 		TreeSet<Integer> rows = getPartitions(0, boardHeight-1, verticalSplits);
 		TreeSet<Integer> cols =  getPartitions(0, boardWidth-1, horizontalSplit);
+		
 		/*
 		 *initialize each row of the borders and the row above it (cyclic). 
 		 *this is because we are giving the parallel part the top left corner of a zone.
 		 */
-		//
+
 		for (Integer i: rows)
 		{
 			for (int j = 0; j < boardWidth; j++ )

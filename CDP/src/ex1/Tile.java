@@ -18,29 +18,26 @@ public class Tile
 	/**
 	 * Represents the Tile's coordinate.
 	 */
-	private Coordinate coordinate;
+	Coordinate coordinate;
+	
+	
 	
 	/**
-	 * Represents the Tile's current state.
+	 *  Represents the Tile's state in all of its generations.
 	 */
-	private Boolean state;
-	
-	/**
-	 *  Represents the Tile's state in the past generations.
-	 */
-	ArrayList<Boolean> previusStates = new ArrayList<Boolean>();
+	ArrayList<Boolean> states = new ArrayList<Boolean>();
 	
 	
 	/**
 	 * Represents the Tile's generation. 
 	 */
-	private int age = 0;
+	int age = 0;
 	
 	
 	/**
 	 * holds the neighbors current ages.
 	 */
-	private HashMap<Coordinate, Integer> neighborsAgesMap = new HashMap<Coordinate, Integer>();
+	HashMap<Coordinate, Integer> neighborsAgesMap = new HashMap<Coordinate, Integer>();
 	
 	
 	
@@ -57,7 +54,7 @@ public class Tile
 	public Tile (int x, int y, Boolean inputState, int boardHeight, int boardWidth)
 	{
 		coordinate = new Coordinate(x, y);
-		state = inputState;	
+		states.add(inputState);
 		for (int i = x - 1 + boardHeight ; i < x + 1 + boardHeight; i++)
 		{
 			for(int j = y - 1 + boardWidth; j < y + 1 + boardWidth; j++)
@@ -83,14 +80,6 @@ public class Tile
 	}
 	
 	
-	/**
-	 * 
-	 * @return The Tile's current state.
-	 */
-	public Boolean getState()
-	{
-		return state;
-	}
 	
 	/**
 	 * 
@@ -99,9 +88,9 @@ public class Tile
 	 * @param age - The desired age of the tile.
 	 * @return The state of the tile in the desired age.
 	 */
-	public Boolean getPreviusState(int age)
+	public Boolean getState(int age)
 	{
-		return previusStates.get(age);
+		return states.get(age);
 	}
 	
 	
@@ -152,6 +141,11 @@ public class Tile
 			}
 		}
 		return true;
+	}
+	
+	public void increaseAge()
+	{
+		age++;
 	}
 	
 	
