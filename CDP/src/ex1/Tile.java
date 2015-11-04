@@ -21,12 +21,18 @@ public class Tile
 	 */
 	Coordinate coordinate;
 	
+	/**
+	 * Represents the Tile's current state.
+	 */
+	boolean state;
 	
 	
 	/**
-	 *  Represents the Tile's state in all of its generations.
+	 * Represents the Tile's previous state.
 	 */
-	ArrayList<Boolean> states = new ArrayList<Boolean>();
+	boolean previousState;
+	
+
 	
 	
 	/**
@@ -55,7 +61,7 @@ public class Tile
 	public Tile (int x, int y, Boolean inputState, int boardHeight, int boardWidth)
 	{
 		coordinate = new Coordinate(x, y);
-		states.add(inputState);
+		state = inputState;
 		for (int i = x - 1 + boardHeight ; i < x + 1 + boardHeight; i++)
 		{
 			for(int j = y - 1 + boardWidth; j < y + 1 + boardWidth; j++)
@@ -92,14 +98,11 @@ public class Tile
 	
 	/**
 	 * 
-	 * 
-	 * 
-	 * @param age - The desired age of the tile.
-	 * @return The state of the tile in the desired age.
+	 * @return - The Til's previous state.
 	 */
-	public Boolean getState(int age)
+	public Boolean getPreviousState()
 	{
-		return states.get(age);
+		return previousState;
 	}
 	
 	
