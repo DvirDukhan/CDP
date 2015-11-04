@@ -99,7 +99,22 @@ public class BoardProcessor implements Runnable
 	 */
 	boolean[][] conditionsMatrix;
 	
+	
+	/**
+	 * 
+	 */
 	Coordinate myConditionCoordinate;
+	
+	/**
+	 * 
+	 */
+	int verticalSplits;
+	
+	
+	/**
+	 * 
+	 */
+	int horizontalSplits;
 	
 	/**
 	 * 
@@ -108,7 +123,7 @@ public class BoardProcessor implements Runnable
 							int inputJ,
 							boolean[][] conditionVariables,
 							Tile[][] gameBoard,
-							boolean[][] intialField,							
+							boolean[][] initialField,							
 							boolean[][][] resultsBoards,
 							int hSplit,
 							int vSplit,
@@ -118,8 +133,43 @@ public class BoardProcessor implements Runnable
 		myConditionCoordinate = new Coordinate(inputI, inputJ);
 		conditionsMatrix = conditionVariables;
 		board = gameBoard;
-		inputBoard = intialField;
+		inputBoard = initialField;
 		results = resultsBoards;
+		horizontalSplits = hSplit;
+		verticalSplits = vSplit;
+		
+		generations = inputGenerations;
+		
+		boardHeight = initialField.length;
+		boardWidth = initialField[0].length;
+		
+		TreeSet<Integer> rows = getPartitions(0, boardHeight-1, verticalSplits);
+		TreeSet<Integer> cols =  getPartitions(0, boardWidth-1, horizontalSplits);
+		
+		Integer[] rowsSplits = (Integer[])rows.toArray();
+		Integer[] colsSplit = (Integer[])cols.toArray();
+		
+		topLeft = new Coordinate(rowsSplits[inputI], colsSplit[inputJ]);
+		
+		if (inputI<horizontalSplits-1)
+		{
+			miniBoardHeight  = rowsSplits[inputI +1] - rowsSplits[inputI];
+		}
+		else
+		{
+			miniBoardHeight = boardHeight - rowsSplits[inputI] -1;
+		}
+		
+		if (inputJ<verticalSplits-1)
+		{
+			miniBoardWidth = colsSplit[inputJ +1] - colsSplit[inputJ];
+		}
+		else
+		{
+			miniBoardWidth = boardWidth - rowsSplits[inputJ] -1;
+		}
+		
+		
 		
 	}
 	
@@ -132,28 +182,69 @@ public class BoardProcessor implements Runnable
 		initializeBorders();
 		synchronized (conditionsMatrix)
 		{
-			while()
+			while(checkOnNeighbors() == false)
 			{
-				wait();
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}	
+		initializeSafeZone();
+		
+		while(finished.size()<miniBoardHeight*miniBoardWidth)
+		{
+			processTile(getNextReadyTile());
+		}	
+		
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private boolean checkOnNeighbors()
+	{
+		
+		
+		int x = myConditionCoordinate.getX() + horizontalSplits;
+		int y = myConditionCoordinate.getY() + verticalSplits;
+		
+		for (int i =(x -1) % horizontalSplits; i < (x + 1) % horizontalSplits; i++ )
+		{
+			for (int j =(y -1) % verticalSplits; j < (y + 1) % verticalSplits; j++ )
+			{
+				if (conditionsMatrix[i][j] == false)
+				{
+					return false;
+				}
 			}
 		}
 		
-		
-		initializeSafeZone();
-		
+		return true;
 		
 		
 	}
 	
 	
+	/**
+	 * 
+	 */
 	private void initializeBorders()
 	{
 		for (int i = topLeft.getX(); i<topLeft.getX()+miniBoardHeight;i++)
 		{
 			int j = topLeft.getY();
 			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);
+			
+			bordersReadyQueue.add(new Coordinate(i,j));
+		
 			j+=miniBoardWidth-1;
-			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);			
+			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);	
+			
+			bordersReadyQueue.add(new Coordinate(i,j));
 		}
 		
 		
@@ -161,8 +252,13 @@ public class BoardProcessor implements Runnable
 		{
 			int i = topLeft.getX();
 			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);
+			
+			bordersReadyQueue.add(new Coordinate(i,j));
+			
 			i+=miniBoardHeight-1;
-			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);			
+			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);	
+			
+			bordersReadyQueue.add(new Coordinate(i,j));
 		}
 		
 		
@@ -180,11 +276,63 @@ public class BoardProcessor implements Runnable
 	 */
 	private void initializeSafeZone()
 	{
-		
+		for (int i = topLeft.getX()+1; i < topLeft.getX()-1 + miniBoardHeight ; i++)
+		{
+			for (int j = topLeft.getY()+1; j < topLeft.getY()-1 + miniBoardWidth ; j++)
+			{
+				board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);	
+				
+				readyQueue.add(new Coordinate(i,j));
+			}
+		}
 	}
 	
 	
-	
+	private Coordinate getNextReadyTile()
+	{
+		if (readyQueue.isEmpty()!= true)
+		{
+			return readyQueue.poll();
+		}
+		if (bordersReadyQueue.isEmpty()!= true)
+		{
+			return bordersReadyQueue.poll();
+		}
+		
+		
+		//fail safe - will never execute
+		Coordinate tmpCoordinate = null;
+		for(Coordinate coordinate : notReadyQueue)
+		{
+			if (board[coordinate.getX()][coordinate.getX()].isReadyToProcess()==true)
+			{
+				tmpCoordinate = coordinate;
+				break;
+			}
+			
+		}
+		if (tmpCoordinate != null)
+		{
+			notReadyQueue.remove(tmpCoordinate);
+			return tmpCoordinate;
+		}
+		else
+		{
+			for(Coordinate coordinate : bordersNotReadyQueue)
+			{
+				if (board[coordinate.getX()][coordinate.getX()].isReadyToProcess()==true)
+				{
+					tmpCoordinate = coordinate;
+					break;
+				}
+				
+			}
+			bordersNotReadyQueue.remove(tmpCoordinate);
+			return tmpCoordinate;
+			
+		}
+		
+	}
 	
 	/**
 	 * Returns if a coordinate is on the border of a miniboard.
