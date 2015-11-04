@@ -19,6 +19,11 @@ public class BoardProcessor implements Runnable
 	 */
 	Queue<Coordinate> readyQueue = new ArrayDeque<Coordinate>();
 	
+	/**
+	 * This queue will hold the coordinates of all the Tiles ready to be processed in the borders.
+	 */
+	Queue<Coordinate> bordersReadyQueue = new ArrayDeque<Coordinate>();
+	
 	
 	/**
 	 *This queue will hold the coordinates of all the Tiles not ready to be processed.
@@ -27,6 +32,12 @@ public class BoardProcessor implements Runnable
 	 *This assumption is a fail-safe mechanism because there is low to zero probability for this to happen.
 	 */
 	Queue<Coordinate> notReadyQueue = new ArrayDeque<Coordinate>();
+	
+	
+	/**
+	 * This queue will hold the coordinates of all the Tiles not ready to be processed in the borders.
+	 */
+	Queue<Coordinate> bordersNotReadyQueue = new ArrayDeque<Coordinate>();
 	
 	
 	/**
@@ -82,17 +93,24 @@ public class BoardProcessor implements Runnable
 	 */
 	boolean[][][] results;
 	
+	/**
+	 * a global matrix which represents when a thread can start to work.
+	 */
+	boolean[][] conditionsMatrix;
 	
 	/**
 	 * 
 	 */
-	public BoardProcessor( boolean[][] intialField,
+	public BoardProcessor(  int i,
+							int j,
+							boolean[][] conditionVariables,
 							Tile[][] gameBoard,
+							boolean[][] intialField,							
 							boolean[][][] resultsBoards,
-							Coordinate topLeftPosition,
-							int miniboardHeight,
-							int miniboardwidth,
-							int generations)
+							int hSplit,
+							int vSplit,
+							int generations
+							)
 	{
 		
 	}
@@ -103,8 +121,15 @@ public class BoardProcessor implements Runnable
 	@Override
 	public void run()
 	{
+		initializeBorders();
 		initializeSafeZone();
 		addBordersToReadyQueue();
+		
+	}
+	
+	
+	private void initializeBorders()
+	{
 		
 	}
 	
@@ -117,13 +142,7 @@ public class BoardProcessor implements Runnable
 	}
 	
 	
-	/**
-	 * 
-	 */
-	private void addBordersToReadyQueue()
-	{
-		
-	}
+	
 	
 	/**
 	 * Returns if a coordinate is on the border of a miniboard.
@@ -177,33 +196,45 @@ public class BoardProcessor implements Runnable
 		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
 		{
 			
-			Tile neighbor = board[neighborCoordinate.getX()][neighborCoordinate.getY()];
 			
-			if (isOutOfMiniboard(neighborCoordinate))
+			boolean state = getTileState(neighborCoordinate, tile.getAge());
+			if (state == true)
 			{
-				synchronized (neighbor)
-				{
-					if (neighbor.getAge() == tile.getAge())
-					//counter+=neighbor.getState();
-				}
+				counter++;
 			}
 			
 		}
-		//TODO:implement!!!
 		
+		//game's logic
+		
+		if (tile.getState() == false && counter == 3)
+		{
+			setTileState(tile, true);
+		}
+		else 
+			if (tile.getState() == true && (counter == 3 || counter == 2 ))
+			{
+			//do nothing
+			}
+			else
+			{
+				setTileState(tile, false);
+			}
+		//TODO:implement!!!
 		
 		
 		tile.increaseAge();
 		
-		//check if need to write to results or 
-		if (tile.getAge()==generations-1)
+		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
 		{
-			results[0][coordinate.getX()][coordinate.getY()] = tile.getState(tile.getAge());
+			updateAgeAtNeighbor(tile.getCoordinate(), neighborCoordinate, tile.getAge());
 		}
 		
+				
 		if (tile.getAge()==generations)
 		{
-			results[1][coordinate.getX()][coordinate.getY()] = tile.getState(tile.getAge());
+			results[0][coordinate.getX()][coordinate.getY()] = tile.getPreviousState();
+			results[1][coordinate.getX()][coordinate.getY()] = tile.getState();
 			finished.add(tile.getCoordinate());
 		}
 		else
@@ -211,6 +242,9 @@ public class BoardProcessor implements Runnable
 			notReadyQueue.add(tile.getCoordinate());
 		}	
 	}
+	
+	
+	
 	
 	
 	/**
@@ -234,5 +268,94 @@ public class BoardProcessor implements Runnable
 		}
 	}
 	
+	/**
+	 * Update a tile's state.
+	 * @param tile - The tile to be update.
+	 * @param state - The Tile's new state.
+	 */
+	private void setTileState(Tile tile, boolean state)
+	{
+		if (isInBorder(tile.getCoordinate()))
+		{
+			synchronized (tile)
+			{
+				tile.setState(state);
+			}
+		}
+		else
+		{
+			tile.setState(state);
+		}
+	}
+	
+	
+	/**
+	 * Updates the processed tile's age at its neighbor.
+	 * @param currentTileCoordinate - The processed tile coordinate.
+	 * @param neighborCoordinate - The neighbor to update.
+	 * @param currentTileAge - The age of the processed tile's age.
+	 */
+	private void updateAgeAtNeighbor(Coordinate currentTileCoordinate, Coordinate neighborCoordinate, int currentTileAge)
+	{
+		Tile neighbor = board[neighborCoordinate.getX()][neighborCoordinate.getY()];
+		if (isOutOfMiniboard(neighborCoordinate))
+		{
+			synchronized ( neighbor)
+			{
+				 neighbor.updateNeighborAge(currentTileCoordinate, currentTileAge);
+			}
+		}
+		if (isInBorder(neighborCoordinate))
+		{
+			boolean isReady;
+			synchronized ( neighbor)
+			{
+				 neighbor.updateNeighborAge(currentTileCoordinate, currentTileAge);
+				 isReady = neighbor.isReadyToProcess();
+				
+			}
+			 if (isReady == true)
+			 {
+				 makeReady(neighborCoordinate);
+			 }
+		}
+		else
+		{
+			boolean isReady;
+			neighbor.updateNeighborAge(currentTileCoordinate, currentTileAge);
+			isReady = neighbor.isReadyToProcess();
+			if (isReady == true)
+			{
+				 makeReady(neighborCoordinate);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Moves the tile coordinate from a "not ready queue" to a "ready queue".
+	 * @param readyTileCoordinate - The coordinate of the ready tile.
+	 */
+	private void makeReady(Coordinate readyTileCoordinate)
+	{
+		if (isInBorder(readyTileCoordinate))
+		{
+			if (bordersNotReadyQueue.contains(readyTileCoordinate))
+			{
+				bordersNotReadyQueue.remove(readyTileCoordinate);
+				bordersReadyQueue.add(readyTileCoordinate);
+			}
+		}
+		else
+		{
+
+			if (notReadyQueue.contains(readyTileCoordinate))
+			{
+				notReadyQueue.remove(readyTileCoordinate);
+				readyQueue.add(readyTileCoordinate);
+			}
+		}
+	}
 
 }

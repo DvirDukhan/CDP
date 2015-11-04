@@ -98,13 +98,30 @@ public class Tile
 	
 	/**
 	 * 
-	 * @return - The Til's previous state.
+	 * @return - The Tile's previous state.
 	 */
 	public Boolean getPreviousState()
 	{
 		return previousState;
 	}
 	
+	
+	
+	/**
+	 * 
+	 * This function return a tile state by requested age.
+	 * 
+	 * @param otherAge - Other tile's age.
+	 * @return The Tile's state in the desired age.
+	 */
+	public boolean getState(int otherAge)
+	{
+		if (age == otherAge)
+		{
+			return state;
+		}
+		return previousState;
+	}
 	
 	/**
 	 * 
@@ -155,13 +172,33 @@ public class Tile
 		return true;
 	}
 	
+	
+	/**
+	 * This function increases the Tile's age by 1.
+	 */
 	public void increaseAge()
 	{
 		age++;
 	}
+	
+	/**
+	 * 
+	 * @return The Tile's neighbors coordinate.
+	 */
 	public Set<Coordinate> getNeighborsCoordinate()
 	{
 		return neighborsAgesMap.keySet();
+	}
+	
+	
+	/**
+	 * Sets the state of the tile.
+	 * @param newState - The new state of the tile.
+	 */
+	public void setState(boolean newState)
+	{
+		previousState = state;
+		state = newState;
 	}
 	
 	
