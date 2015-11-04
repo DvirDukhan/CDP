@@ -30,55 +30,69 @@ public class BoardProcessor implements Runnable
 	
 	
 	/**
-	 * 
+	 * This array holds the coordinates of all the tiles that are in maximum generation.
 	 */
 	ArrayList<Coordinate> finished = new ArrayList<Coordinate>();
 	
 	
 	/**
-	 * 
+	 * Represents the top left coordinate of the miniboard.
 	 */
 	Coordinate topLeft;
 	
 	/**
-	 * 
+	 * Represents the miniboard height.
 	 */
 	int miniBoardHeight;
 	
 	/**
-	 * 
+	 * Represents the miniboard width.
 	 */
 	int miniBoardWidth;
 	
 	/**
-	 * 
+	 * The original input board. Used for parallel initialization.
 	 */
 	boolean[][] inputBoard;
 
 	
 	/**
-	 * 
+	 * The actual game board.
 	 */
 	Tile[][] board;
 	
 	/**
-	 * 
+	 * Represents the game board height.
 	 */
 	int boardHeight;
 
 	/**
-	 * 
+	 * Represents the game board width.
 	 */
 	int boardWidth;
 	
+	
+	/**
+	 * The number of the desired generations the game should run;
+	 */
 	int generations;
+	
+	/**
+	 * The output for the game.
+	 */
 	boolean[][][] results;
 	
 	
 	/**
 	 * 
 	 */
-	public BoardProcessor()
+	public BoardProcessor( boolean[][] intialField,
+							Tile[][] gameBoard,
+							boolean[][][] resultsBoards,
+							Coordinate topLeftPosition,
+							int miniboardHeight,
+							int miniboardwidth,
+							int generations)
 	{
 		
 	}
@@ -128,6 +142,25 @@ public class BoardProcessor implements Runnable
 	}
 	
 	/**
+	 * Returns if a coordinate is outside the miniboard.
+	 * @param coordinate - A Tile coordinate.
+	 * @return If the tile is outside the miniboard.
+	 */
+	private boolean isOutOfMiniboard(Coordinate coordinate)
+	{
+		if (coordinate.getX() == topLeft.getX() -1 ||
+			coordinate.getX() == topLeft.getX()+miniBoardHeight ||
+			coordinate.getY() == topLeft.getY()-1 ||
+			coordinate.getY() == topLeft.getY()+miniBoardWidth)
+			return true;
+		
+		return false;
+	}
+	
+	
+	
+	
+	/**
 	 * This functions checks if the tile should be dead or alive in the next generation.
 	 * <p>
 	 * If the current generation is in the requested generations for results than the Tile's status will be written in the results.
@@ -140,7 +173,22 @@ public class BoardProcessor implements Runnable
 		Tile tile = board[coordinate.getX()][coordinate.getY()];
 		
 		//do the stuff
-		
+		int counter = 0;
+		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
+		{
+			
+			Tile neighbor = board[neighborCoordinate.getX()][neighborCoordinate.getY()];
+			
+			if (isOutOfMiniboard(neighborCoordinate))
+			{
+				synchronized (neighbor)
+				{
+					if (neighbor.getAge() == tile.getAge())
+					//counter+=neighbor.getState();
+				}
+			}
+			
+		}
 		//TODO:implement!!!
 		
 		
@@ -161,9 +209,29 @@ public class BoardProcessor implements Runnable
 		else
 		{
 			notReadyQueue.add(tile.getCoordinate());
+		}	
+	}
+	
+	
+	/**
+	 * 
+	 * @param coordinate - The Tile's coordinate.
+	 * @param age - The Tile's requsted age.
+	 * @return The Tile's state in the given age.
+	 */
+	private boolean getTileState(Coordinate coordinate, int age)
+	{
+		Tile tile = board[coordinate.getX()][coordinate.getY()];
+		if (isOutOfMiniboard(tile.getCoordinate()))
+		{
+			synchronized (tile) {
+				return tile.getState(age);
+			}
 		}
-		
-		
+		else
+		{
+			return tile.getState(age);
+		}
 	}
 	
 

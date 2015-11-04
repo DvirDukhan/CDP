@@ -2,6 +2,7 @@ package ex1;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 
 
@@ -79,6 +80,14 @@ public class Tile
 		return coordinate;
 	}
 	
+	/**
+	 * 
+	 * @return - The Tile's state.
+	 */
+	public Boolean getState()
+	{
+		return state;
+	}
 	
 	
 	/**
@@ -146,6 +155,10 @@ public class Tile
 	public void increaseAge()
 	{
 		age++;
+	}
+	public Set<Coordinate> getNeighborsCoordinate()
+	{
+		return neighborsAgesMap.keySet();
 	}
 	
 	
