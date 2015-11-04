@@ -3,6 +3,7 @@ package ex1;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Queue;
+import java.util.TreeSet;
 
 /**
  * An instance of this class can process a mini board given to it.
@@ -98,20 +99,27 @@ public class BoardProcessor implements Runnable
 	 */
 	boolean[][] conditionsMatrix;
 	
+	Coordinate myConditionCoordinate;
+	
 	/**
 	 * 
 	 */
-	public BoardProcessor(  int i,
-							int j,
+	public BoardProcessor(  int inputI,
+							int inputJ,
 							boolean[][] conditionVariables,
 							Tile[][] gameBoard,
 							boolean[][] intialField,							
 							boolean[][][] resultsBoards,
 							int hSplit,
 							int vSplit,
-							int generations
+							int inputGenerations
 							)
 	{
+		myConditionCoordinate = new Coordinate(inputI, inputJ);
+		conditionsMatrix = conditionVariables;
+		board = gameBoard;
+		inputBoard = intialField;
+		results = resultsBoards;
 		
 	}
 	
@@ -122,14 +130,48 @@ public class BoardProcessor implements Runnable
 	public void run()
 	{
 		initializeBorders();
+		synchronized (conditionsMatrix)
+		{
+			while()
+			{
+				wait();
+			}
+		}
+		
+		
 		initializeSafeZone();
-		addBordersToReadyQueue();
+		
+		
 		
 	}
 	
 	
 	private void initializeBorders()
 	{
+		for (int i = topLeft.getX(); i<topLeft.getX()+miniBoardHeight;i++)
+		{
+			int j = topLeft.getY();
+			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);
+			j+=miniBoardWidth-1;
+			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);			
+		}
+		
+		
+		for (int j = topLeft.getY(); j<topLeft.getY()+miniBoardWidth;j++)
+		{
+			int i = topLeft.getX();
+			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);
+			i+=miniBoardHeight-1;
+			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);			
+		}
+		
+		
+		synchronized (conditionsMatrix)
+		{
+			conditionsMatrix[myConditionCoordinate.getX()][myConditionCoordinate.getY()] = true;
+			notifyAll();
+		}
+		
 		
 	}
 	
@@ -356,6 +398,29 @@ public class BoardProcessor implements Runnable
 				readyQueue.add(readyTileCoordinate);
 			}
 		}
+	}
+	
+	/**
+	 * This function will return all the indices which represents margins of mini boards on the segment.
+	 * @param left - The left most index of the segment.
+	 * @param right - The right most index of the segment.
+	 * @return A sorted set of indices which represents the segment's partition.
+	 */
+	public TreeSet<Integer> getPartitions(int left, int right , int splits)
+	{
+		TreeSet<Integer> results = new TreeSet<Integer>();
+		if (splits==1){			
+			results.add(left);
+			return results;
+		}
+		int topPart = (int)Math.ceil(splits/2.0);
+		int lastPart = splits/2;
+		int middle = (int)Math.ceil((left + right)/2.0);
+		results.addAll(getPartitions(left, middle, topPart));
+		results.addAll(getPartitions(middle, right, lastPart));
+		return results;
+		
+		
 	}
 
 }
