@@ -62,9 +62,9 @@ public class Tile
 	{
 		coordinate = new Coordinate(x, y);
 		state = inputState;
-		for (int i = x - 1 + boardHeight ; i < x + 1 + boardHeight; i++)
+		for (int i = x - 1 + boardHeight ; i < x + 2 + boardHeight; i++)
 		{
-			for(int j = y - 1 + boardWidth; j < y + 1 + boardWidth; j++)
+			for(int j = y - 1 + boardWidth; j < y + 2 + boardWidth; j++)
 			{
 				if(i % boardHeight == x && j % boardWidth == y)
 				{

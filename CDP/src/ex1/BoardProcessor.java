@@ -222,9 +222,9 @@ public class BoardProcessor implements Runnable
 		int x = myConditionCoordinate.getX() + horizontalSplits;
 		int y = myConditionCoordinate.getY() + verticalSplits;
 		
-		for (int i =(x -1) % horizontalSplits; i < (x + 1) % horizontalSplits; i++ )
+		for (int i =(x -1) % horizontalSplits; i < (x + 2) % horizontalSplits; i++ )
 		{
-			for (int j =(y -1) % verticalSplits; j < (y + 1) % verticalSplits; j++ )
+			for (int j =(y -1) % verticalSplits; j < (y + 2) % verticalSplits; j++ )
 			{
 				if (conditionsMatrix[i][j] == false)
 				{
