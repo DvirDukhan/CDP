@@ -101,23 +101,33 @@ public class BoardProcessor implements Runnable
 	
 	
 	/**
-	 * 
+	 * Represents the coordinate of the instance of this class in the conditions board.
 	 */
 	Coordinate myConditionCoordinate;
 	
 	/**
-	 * 
+	 * Represents the number of vertical splits of the game board.
 	 */
 	int verticalSplits;
 	
 	
 	/**
-	 * 
+	 *  Represents the number of horizontal splits of the game board.
 	 */
 	int horizontalSplits;
 	
+	
 	/**
-	 * 
+	 * BoardProcessor constructor.
+	 * @param inputI - the x value of the board processor coordinate in the conditions matrix.
+	 * @param inputJ - the y value of the board processor coordinate in the conditions matrix.
+	 * @param conditionVariables - A boolean hsplit*vsplit matrix which holds for each  board processor if it finished to initialize its boarders.
+	 * @param gameBoard - The actual gameboard.
+	 * @param initialField - The initial values for the board.
+	 * @param resultsBoards - The results boards.
+	 * @param hSplit - The number of horizontal splits.
+	 * @param vSplit - The number of vertical splits.
+	 * @param inputGenerations - The number of generations the game should play.
 	 */
 	public BoardProcessor(  int inputI,
 							int inputJ,
@@ -202,8 +212,8 @@ public class BoardProcessor implements Runnable
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * This function checks if the neighbors of this board processor finished their miniboard border initialization.
+	 * @return if the board processor can start processing its mini board.
 	 */
 	private boolean checkOnNeighbors()
 	{
@@ -230,7 +240,7 @@ public class BoardProcessor implements Runnable
 	
 	
 	/**
-	 * 
+	 * Initialize the borders of the miniboard.
 	 */
 	private void initializeBorders()
 	{
@@ -272,7 +282,7 @@ public class BoardProcessor implements Runnable
 	}
 	
 	/**
-	 * 
+	 * Initializes the tiles which are not in the borders.
 	 */
 	private void initializeSafeZone()
 	{
@@ -288,6 +298,10 @@ public class BoardProcessor implements Runnable
 	}
 	
 	
+	/**
+	 * 
+	 * @return The coordinate of the next ready tile.
+	 */
 	private Coordinate getNextReadyTile()
 	{
 		if (readyQueue.isEmpty()!= true)
@@ -300,7 +314,7 @@ public class BoardProcessor implements Runnable
 		}
 		
 		
-		//fail safe - will never execute
+		//fail safe - hopefully will never execute
 		Coordinate tmpCoordinate = null;
 		for(Coordinate coordinate : notReadyQueue)
 		{
@@ -429,7 +443,7 @@ public class BoardProcessor implements Runnable
 		}
 		else
 		{
-			notReadyQueue.add(tile.getCoordinate());
+			makeNotReady(tile.getCoordinate());
 		}	
 	}
 	
@@ -544,6 +558,31 @@ public class BoardProcessor implements Runnable
 			{
 				notReadyQueue.remove(readyTileCoordinate);
 				readyQueue.add(readyTileCoordinate);
+			}
+		}
+	}
+	
+	
+	/**
+	 * This function enququ a not ready tile in the not ready queue, by its classification (border or not border).
+	 * @param notReadyTileCoordinate - The no ready Tile's coordinate.
+	 */
+	private void makeNotReady(Coordinate notReadyTileCoordinate)
+	{
+		if (isInBorder(notReadyTileCoordinate))
+		{
+			if (!bordersNotReadyQueue.contains(notReadyTileCoordinate))
+			{
+				bordersNotReadyQueue.add(notReadyTileCoordinate);
+			}
+		}
+		else
+		{
+
+			if (notReadyQueue.contains(notReadyTileCoordinate))
+			{
+				notReadyQueue.add(notReadyTileCoordinate);
+
 			}
 		}
 	}
