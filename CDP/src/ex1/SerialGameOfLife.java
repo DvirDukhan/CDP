@@ -32,7 +32,7 @@ public class SerialGameOfLife implements GameOfLife {
 				
 				for (int j=0;j<initalField[i].length;j++){
 					int numNeighbors=numNeighbors(i,j,input);
-					System.err.println(" tile " + i + ", " + j + " serial: number of neighbors = " + numNeighbors);
+					//System.err.println(" tile " + i + ", " + j + " serial: number of neighbors = " + numNeighbors);
 					result[i][j]=false;
 					if (numNeighbors==3 || (input[i][j]&& numNeighbors==2)){
 						result[i][j]=true;

@@ -1,7 +1,9 @@
 package ex1;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Queue;
 import java.util.Set;
 
 
@@ -45,8 +47,7 @@ public class Tile
 	 * holds the neighbors current ages.
 	 */
 	HashMap<Coordinate, Integer> neighborsAgesMap = new HashMap<Coordinate, Integer>();
-	
-	
+
 	
 	/**
 	 * 
@@ -60,6 +61,8 @@ public class Tile
 	 */
 	public Tile (int x, int y, Boolean inputState, int boardHeight, int boardWidth)
 	{
+		
+
 		coordinate = new Coordinate(x, y);
 		state = inputState;
 		for (int i = x - 1 + boardHeight ; i < x + 2 + boardHeight; i++)
@@ -159,9 +162,16 @@ public class Tile
 	{
 		for (Coordinate neighborCoordinate : neighborsAgesMap.keySet())
 		{
+			if (neighborCoordinate.equals(coordinate))
+			{
+				//System.err.println("neighbor in coordinate " + neighborCoordinate.toString() + "is equal to tile's coordinate " + coordinate.toString());
+				continue;
+			}
 			int neighborAge = neighborsAgesMap.get(neighborCoordinate);
 			if (neighborAge < age)
 			{
+				//System.err.println("neighbor in coordinate " + neighborCoordinate.toString() + " age = " + neighborAge + 
+				//	"\nthis coordiante " + coordinate.toString() + " age = " + age);
 				return false;
 			}
 			

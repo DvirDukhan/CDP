@@ -332,8 +332,8 @@ public class BoardProcessorTest {
 								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits, vsplits,1);
 								bp.initializeBorders();
 								bp.initializeSafeZone();
-								assertNotEquals(0, bp.miniBoardHeight);
-								assertNotEquals(0, bp.miniBoardWidth);
+								assertNotEquals(0, bp.getMiniboardHeight());
+								assertNotEquals(0, bp.getMiniboardWidth());
 							}
 						}
 						
@@ -342,6 +342,7 @@ public class BoardProcessorTest {
 							for (int j =0 ;j < cols; j++ )
 							{
 								assertNotNull("in board [" + i + "][" + j + "]",board[i][j]);
+								assertEquals(board[i][j].getCoordinate(), new Coordinate(i, j));
 							}
 						}
 																					

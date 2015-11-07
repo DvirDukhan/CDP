@@ -86,6 +86,7 @@ public class ParallelGameOfLife implements GameOfLife {
 
 		//Create Workers
 		boardProcessors  = new BoardProcessor[vSplit][hSplit];
+		threads = new Thread[vSplit][hSplit];
 		for (int i=0; i < vSplit; i++)
 		{
 			for (int j=0; j < hSplit; j++)
@@ -138,92 +139,7 @@ public class ParallelGameOfLife implements GameOfLife {
 		*/
 	}
 	
-	/**
-	 * This function will create the borders of the board, since parallel initialization is risky due to null objects
-	 */
-	public void bordersInitialize()
-	{
-		TreeSet<Integer> rows = getPartitions(0, boardHeight-1, verticalSplits);
-		TreeSet<Integer> cols =  getPartitions(0, boardWidth-1, horizontalSplit);
-		
-		/*
-		 *initialize each row of the borders and the row above it (cyclic). 
-		 *this is because we are giving the parallel part the top left corner of a zone.
-		 */
 
-		for (Integer i: rows)
-		{
-			for (int j = 0; j < boardWidth; j++ )
-			{
-				int x = (i + boardHeight) % boardHeight;
-				int y = j;
-				if (board[x][y]==null)
-				{
-					board[x][y] = new Tile(x, y, inputBoard[x][y], boardHeight, boardWidth);
-				}
-				
-				x = (i - 1 + boardHeight) % boardHeight;
-				if (board[x][y]==null)
-				{
-					board[x][y] = new Tile(x, y, inputBoard[x][y], boardHeight, boardWidth);
-				}
-			}
-		}
-		
-		/*
-		 * initialize each column of the boarders and the column to its left (cyclic).
-		 * this is because we are giving the parallel part the top left corner of a zone.
-		 */
-		
-		
-		for (Integer j: cols)
-		{
-			for(int i = 0; i<boardHeight; i++ )
-			{
-				int x = i;
-				int y = (j + boardWidth) % boardWidth;
-				if (board[x][y]==null)
-				{
-					board[x][y] = new Tile(x, y, inputBoard[x][y], boardHeight, boardWidth);
-				}
-				y = (j -1 + boardWidth) % boardWidth;
-				if (board[x][y]==null)
-				{
-					board[x][y] = new Tile(x, y, inputBoard[x][y], boardHeight, boardWidth);
-				}
-				 
-			}
-		}
-	}
-	
-	
-	
-	
-	
-	
-	/**
-	 * This function will return all the indices which represents margins of mini boards on the segment.
-	 * @param left - The left most index of the segment.
-	 * @param right - The right most index of the segment.
-	 * @return A sorted set of indices which represents the segment's partition.
-	 */
-	public TreeSet<Integer> getPartitions(int left, int right , int splits)
-	{
-		TreeSet<Integer> results = new TreeSet<Integer>();
-		if (splits==1){			
-			results.add(left);
-			return results;
-		}
-		int topPart = (int)Math.ceil(splits/2.0);
-		int lastPart = splits/2;
-		int middle = (int)Math.ceil((left + right)/2.0);
-		results.addAll(getPartitions(left, middle, topPart));
-		results.addAll(getPartitions(middle, right, lastPart));
-		return results;
-		
-		
-	}
-	
 	
 
 
