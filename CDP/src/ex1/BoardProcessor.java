@@ -2,6 +2,7 @@ package ex1;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.TreeSet;
 
@@ -135,8 +136,10 @@ public class BoardProcessor implements Runnable
 							Tile[][] gameBoard,
 							boolean[][] initialField,							
 							boolean[][][] resultsBoards,
-							int hSplit,
+							
 							int vSplit,
+							int hSplit,
+							
 							int inputGenerations
 							)
 	{
@@ -153,30 +156,35 @@ public class BoardProcessor implements Runnable
 		boardHeight = initialField.length;
 		boardWidth = initialField[0].length;
 		
-		TreeSet<Integer> rows = getPartitions(0, boardHeight-1, verticalSplits);
-		TreeSet<Integer> cols =  getPartitions(0, boardWidth-1, horizontalSplits);
+		TreeSet<Integer> rows = getPartitions(0, boardHeight, verticalSplits);
+		TreeSet<Integer> cols =  getPartitions(0, boardWidth, horizontalSplits);
 		
-		Integer[] rowsSplits = (Integer[])rows.toArray();
-		Integer[] colsSplit = (Integer[])cols.toArray();
+		
+		
+		
+		Integer[] rowsSplits = new Integer[rows.size()];
+		rowsSplits = rows.toArray(rowsSplits);
+		Integer[] colsSplit = new Integer[cols.size()];
+		colsSplit = cols.toArray(colsSplit);
 		
 		topLeft = new Coordinate(rowsSplits[inputI], colsSplit[inputJ]);
 		
-		if (inputI<horizontalSplits-1)
+		if (inputI<verticalSplits-1)
 		{
 			miniBoardHeight  = rowsSplits[inputI +1] - rowsSplits[inputI];
 		}
 		else
 		{
-			miniBoardHeight = boardHeight - rowsSplits[inputI] -1;
+			miniBoardHeight = boardHeight - rowsSplits[inputI] ;
 		}
 		
-		if (inputJ<verticalSplits-1)
+		if (inputJ<horizontalSplits-1)
 		{
 			miniBoardWidth = colsSplit[inputJ +1] - colsSplit[inputJ];
 		}
 		else
 		{
-			miniBoardWidth = boardWidth - rowsSplits[inputJ] -1;
+			miniBoardWidth = boardWidth - colsSplit[inputJ] ;
 		}
 		
 		
@@ -215,18 +223,18 @@ public class BoardProcessor implements Runnable
 	 * This function checks if the neighbors of this board processor finished their miniboard border initialization.
 	 * @return if the board processor can start processing its mini board.
 	 */
-	private boolean checkOnNeighbors()
+	boolean checkOnNeighbors()
 	{
 		
 		
-		int x = myConditionCoordinate.getX() + horizontalSplits;
-		int y = myConditionCoordinate.getY() + verticalSplits;
+		int x = myConditionCoordinate.getX() + verticalSplits;
+		int y = myConditionCoordinate.getY() + horizontalSplits;
 		
-		for (int i =(x -1) % horizontalSplits; i < (x + 2) % horizontalSplits; i++ )
+		for (int i =(x -1) ; i < (x + 2) ; i++ )
 		{
-			for (int j =(y -1) % verticalSplits; j < (y + 2) % verticalSplits; j++ )
+			for (int j =(y -1) ; j < (y + 2) ; j++ )
 			{
-				if (conditionsMatrix[i][j] == false)
+				if (conditionsMatrix[i % verticalSplits][j % horizontalSplits] == false)
 				{
 					return false;
 				}
@@ -242,19 +250,30 @@ public class BoardProcessor implements Runnable
 	/**
 	 * Initialize the borders of the miniboard.
 	 */
-	private void initializeBorders()
+	void initializeBorders()
 	{
+		Coordinate c;
 		for (int i = topLeft.getX(); i<topLeft.getX()+miniBoardHeight;i++)
 		{
 			int j = topLeft.getY();
 			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);
 			
-			bordersReadyQueue.add(new Coordinate(i,j));
+			c = new Coordinate(i,j);
+			if (!bordersReadyQueue.contains(c))
+			{
+				bordersReadyQueue.add(c);
+			}
+			
+			
 		
 			j+=miniBoardWidth-1;
 			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);	
 			
-			bordersReadyQueue.add(new Coordinate(i,j));
+			c = new Coordinate(i,j);
+			if (!bordersReadyQueue.contains(c))
+			{
+				bordersReadyQueue.add(c);
+			}
 		}
 		
 		
@@ -263,19 +282,27 @@ public class BoardProcessor implements Runnable
 			int i = topLeft.getX();
 			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);
 			
-			bordersReadyQueue.add(new Coordinate(i,j));
+			c = new Coordinate(i,j);
+			if (!bordersReadyQueue.contains(c))
+			{
+				bordersReadyQueue.add(c);
+			}
 			
 			i+=miniBoardHeight-1;
 			board[i][j] = new Tile(i, j, inputBoard[i][j], boardHeight,  boardWidth);	
 			
-			bordersReadyQueue.add(new Coordinate(i,j));
+			c = new Coordinate(i,j);
+			if (!bordersReadyQueue.contains(c))
+			{
+				bordersReadyQueue.add(c);
+			}
 		}
 		
 		
 		synchronized (conditionsMatrix)
 		{
 			conditionsMatrix[myConditionCoordinate.getX()][myConditionCoordinate.getY()] = true;
-			notifyAll();
+			conditionsMatrix.notifyAll();
 		}
 		
 		
@@ -284,7 +311,7 @@ public class BoardProcessor implements Runnable
 	/**
 	 * Initializes the tiles which are not in the borders.
 	 */
-	private void initializeSafeZone()
+	void initializeSafeZone()
 	{
 		for (int i = topLeft.getX()+1; i < topLeft.getX()-1 + miniBoardHeight ; i++)
 		{
@@ -302,7 +329,7 @@ public class BoardProcessor implements Runnable
 	 * 
 	 * @return The coordinate of the next ready tile.
 	 */
-	private Coordinate getNextReadyTile()
+	Coordinate getNextReadyTile()
 	{
 		if (readyQueue.isEmpty()!= true)
 		{
@@ -353,7 +380,7 @@ public class BoardProcessor implements Runnable
 	 * @param coordinate - A Tile coordinate.
 	 * @return If the tile is on the border of the miniboard.
 	 */
-	private boolean isInBorder(Coordinate coordinate)
+	boolean isInBorder(Coordinate coordinate)
 	{
 		if (coordinate.getX() == topLeft.getX() ||
 			coordinate.getX() == topLeft.getX()+miniBoardHeight-1 ||
@@ -369,15 +396,27 @@ public class BoardProcessor implements Runnable
 	 * @param coordinate - A Tile coordinate.
 	 * @return If the tile is outside the miniboard.
 	 */
-	private boolean isOutOfMiniboard(Coordinate coordinate)
+	boolean isOutOfMiniboard(Coordinate coordinate)
 	{
-		if (coordinate.getX() == topLeft.getX() -1 ||
-			coordinate.getX() == topLeft.getX()+miniBoardHeight ||
-			coordinate.getY() == topLeft.getY()-1 ||
-			coordinate.getY() == topLeft.getY()+miniBoardWidth)
+		
+		if ((coordinate.getX()>= topLeft.getX()) && (coordinate.getX() <= topLeft.getX() + miniBoardHeight -1) &&
+			(coordinate.getY()>= topLeft.getY() )&& (coordinate.getY() <= topLeft.getY() + miniBoardWidth -1 ))
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+		/*
+		if (coordinate.getX() == (topLeft.getX() -1 + boardHeight) % boardHeight ||
+			coordinate.getX() == (topLeft.getX()+miniBoardHeight + boardHeight) % boardHeight||
+			coordinate.getY() == (topLeft.getY()-1 + boardWidth) % boardWidth ||
+			coordinate.getY() == (topLeft.getY()+miniBoardWidth + boardWidth) % boardWidth)
 			return true;
 		
 		return false;
+		*/
 	}
 	
 	
@@ -391,7 +430,7 @@ public class BoardProcessor implements Runnable
 	 * If the Tile current generation is maximum generation than the tile will be moved to finished and will not be processed anymore.
 	 * @param coordinate - The coordinate of tile to process
 	 */
-	private void processTile(Coordinate coordinate)
+	void processTile(Coordinate coordinate)
 	{
 		Tile tile = board[coordinate.getX()][coordinate.getY()];
 		
@@ -411,23 +450,14 @@ public class BoardProcessor implements Runnable
 		
 		//game's logic
 		
-		if (tile.getState() == false && counter == 3)
-		{
-			setTileState(tile, true);
-		}
-		else 
-			if (tile.getState() == true && (counter == 3 || counter == 2 ))
-			{
-			//do nothing
-			}
-			else
-			{
-				setTileState(tile, false);
-			}
+		
+		activateGameLogic(tile,counter);
+		
+		
 		//TODO:implement!!!
 		
 		
-		tile.increaseAge();
+		
 		
 		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
 		{
@@ -451,13 +481,31 @@ public class BoardProcessor implements Runnable
 	
 	
 	
+	void activateGameLogic(Tile tile, int counter) 
+	{
+		if (tile.getState() == false && counter == 3)
+		{
+			setTileState(tile, true);
+		}
+		else 
+			if (tile.getState() == true && (counter == 3 || counter == 2 ))
+			{
+			//do nothing
+			}
+			else
+			{
+				setTileState(tile, false);
+			}
+		
+	}
+
 	/**
 	 * 
 	 * @param coordinate - The Tile's coordinate.
 	 * @param age - The Tile's requsted age.
 	 * @return The Tile's state in the given age.
 	 */
-	private boolean getTileState(Coordinate coordinate, int age)
+	boolean getTileState(Coordinate coordinate, int age)
 	{
 		Tile tile = board[coordinate.getX()][coordinate.getY()];
 		if (isOutOfMiniboard(tile.getCoordinate()))
@@ -477,18 +525,20 @@ public class BoardProcessor implements Runnable
 	 * @param tile - The tile to be update.
 	 * @param state - The Tile's new state.
 	 */
-	private void setTileState(Tile tile, boolean state)
+	void setTileState(Tile tile, boolean state)
 	{
 		if (isInBorder(tile.getCoordinate()))
 		{
 			synchronized (tile)
 			{
 				tile.setState(state);
+				tile.increaseAge();
 			}
 		}
 		else
 		{
 			tile.setState(state);
+			tile.increaseAge();
 		}
 	}
 	
@@ -499,7 +549,7 @@ public class BoardProcessor implements Runnable
 	 * @param neighborCoordinate - The neighbor to update.
 	 * @param currentTileAge - The age of the processed tile's age.
 	 */
-	private void updateAgeAtNeighbor(Coordinate currentTileCoordinate, Coordinate neighborCoordinate, int currentTileAge)
+	void updateAgeAtNeighbor(Coordinate currentTileCoordinate, Coordinate neighborCoordinate, int currentTileAge)
 	{
 		Tile neighbor = board[neighborCoordinate.getX()][neighborCoordinate.getY()];
 		if (isOutOfMiniboard(neighborCoordinate))
@@ -541,7 +591,7 @@ public class BoardProcessor implements Runnable
 	 * Moves the tile coordinate from a "not ready queue" to a "ready queue".
 	 * @param readyTileCoordinate - The coordinate of the ready tile.
 	 */
-	private void makeReady(Coordinate readyTileCoordinate)
+	void makeReady(Coordinate readyTileCoordinate)
 	{
 		if (isInBorder(readyTileCoordinate))
 		{
@@ -567,7 +617,7 @@ public class BoardProcessor implements Runnable
 	 * This function enququ a not ready tile in the not ready queue, by its classification (border or not border).
 	 * @param notReadyTileCoordinate - The no ready Tile's coordinate.
 	 */
-	private void makeNotReady(Coordinate notReadyTileCoordinate)
+	void makeNotReady(Coordinate notReadyTileCoordinate)
 	{
 		if (isInBorder(notReadyTileCoordinate))
 		{
@@ -593,7 +643,7 @@ public class BoardProcessor implements Runnable
 	 * @param right - The right most index of the segment.
 	 * @return A sorted set of indices which represents the segment's partition.
 	 */
-	public TreeSet<Integer> getPartitions(int left, int right , int splits)
+	TreeSet<Integer> getPartitions(int left, int right , int splits)
 	{
 		TreeSet<Integer> results = new TreeSet<Integer>();
 		if (splits==1){			
@@ -605,9 +655,33 @@ public class BoardProcessor implements Runnable
 		int middle = (int)Math.ceil((left + right)/2.0);
 		results.addAll(getPartitions(left, middle, topPart));
 		results.addAll(getPartitions(middle, right, lastPart));
-		return results;
-		
+		return results;		
 		
 	}
+	
+	
+	
+	/**
+	 * 
+	 * @return The miniboard height.
+	 */
+	int getMiniboardHeight()
+	{
+		return miniBoardHeight;
+	}
+	
+	
+	/**
+	 * 
+	 * @return  The miniboard width.
+	 */
+	int getMiniboardWidth()
+	{
+		return miniBoardWidth;
+	}
+	
+	
+	
+	
 
 }

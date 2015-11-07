@@ -3,6 +3,7 @@ package ex1;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Set;
 
 import org.junit.Before;
@@ -10,24 +11,39 @@ import org.junit.Test;
 
 public class TileTest {
 	
+	HashMap<Coordinate, ArrayList<Coordinate>> coordinateMap = new HashMap<Coordinate, ArrayList<Coordinate>>();
 	
-	ArrayList<Coordinate> coordinates = new ArrayList<Coordinate>();
+	
 	
 	@Before
-	public void initCoordinates()
+	public void initCoordinatesMap()
 	{
+		for (int i =0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				ArrayList<Coordinate> coordinates = initCoordinates();
+				Coordinate c = new Coordinate(i, j);
+				coordinates.remove(c);
+				coordinateMap.put(c, coordinates);
+			}
+		}
+	}
+	
+	
+	
+	public ArrayList<Coordinate> initCoordinates()
+	{
+		ArrayList<Coordinate> coordinates = new ArrayList<Coordinate>();
 		for (int i =0; i<3; i++)
 		{
 			for (int j=0; j<3; j++)
 			{
-				if (i==1 && j==1)
-				{
-					continue;
-				}
 				Coordinate c = new Coordinate(i, j);
 				coordinates.add(c);
 			}
 		}
+		return coordinates;
 	}
 
 	@Test
@@ -97,14 +113,21 @@ public class TileTest {
 	
 	@Test
 	public void testGetNeighborsCoordinate() {
-			
-		Tile tile = new Tile (1,1,true,3,3);
-		Set<Coordinate> neighbors = tile.getNeighborsCoordinate();
-		assertEquals(coordinates.size(),neighbors.size());
-		for(Coordinate c : coordinates)
+		
+		for (int i =0; i <3; i++)
 		{
-			assertTrue(neighbors.contains(c));
-		}
+			for (int j =0; j<3; j++)
+			{
+				Tile tile = new Tile (i,j,true,3,3);
+				Set<Coordinate> neighbors = tile.getNeighborsCoordinate();
+				ArrayList<Coordinate> coordinates = coordinateMap.get(tile.getCoordinate());
+				assertEquals(coordinates.size(),neighbors.size());
+				for(Coordinate c : coordinates)
+				{
+					assertTrue(neighbors.contains(c));
+				}
+			}
+		}		
 		
 	}
 	
@@ -114,25 +137,41 @@ public class TileTest {
 	
 	@Test
 	public void testIsReadyToProcess() {
-		Tile tile = new Tile (1,1,true,3,3);
-		Set<Coordinate> neighbors = tile.getNeighborsCoordinate();
-		
-		tile.increaseAge();
-		assertFalse(tile.isReadyToProcess());
-		
-		for (int i =0; i< coordinates.size(); i++)
+
+		for (int i =0; i <3; i++)
 		{
-			tile.updateNeighborAge(coordinates.get(i), tile.getAge());
-			if (i==coordinates.size()-1)
+			for (int j =0; j<3; j++)
 			{
+				Tile tile = new Tile (i,j,true,3,3);
+				ArrayList<Coordinate> coordinates = coordinateMap.get(tile.getCoordinate());
+				
 				assertTrue(tile.isReadyToProcess());
-			}
-			else
-			{
+				tile.increaseAge();
 				assertFalse(tile.isReadyToProcess());
+				for (int k =0; k< coordinates.size(); k++)
+				{
+					tile.updateNeighborAge(coordinates.get(k), tile.getAge());
+					if (k==coordinates.size()-1)
+					{
+						assertTrue(tile.isReadyToProcess());
+					}
+					else
+					{
+						assertFalse(tile.isReadyToProcess());
+					}
+					
+				}
+				
 			}
-			
 		}
+		
+		
+		
+		
+		
+		
+		
+	
 						
 	}
 	
