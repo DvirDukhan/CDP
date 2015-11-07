@@ -24,7 +24,7 @@ public class TileTest {
 			{
 				ArrayList<Coordinate> coordinates = initCoordinates();
 				Coordinate c = new Coordinate(i, j);
-				coordinates.remove(c);
+				//coordinates.remove(c);
 				coordinateMap.put(c, coordinates);
 			}
 		}

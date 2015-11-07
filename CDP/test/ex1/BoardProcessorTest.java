@@ -17,11 +17,30 @@ public class BoardProcessorTest {
 	Tile[][] board;
 	boolean[][][] results; 
 	
+	
+	boolean[][] initiailFeild1 = new boolean[][]{ {false, false, false}, 
+													 {false, true, false}, 
+													 {false, false, false}};
+													 
+	boolean[][] finalFeild1 = new boolean[][]{ {false, false, false}, 
+										       {false, false, false}, 
+										       {false, false, false}};	
+										       
+	boolean[][] initialFeild2 = new boolean[][]{ {true, true, true}, 
+		 										 {false, false, false}, 
+		 										 {false, false, false}};
+	
+    boolean[][] finalFeild2 = new boolean[][]{ {true, true, true}, 
+			 										 {true, true, true}, 
+			 										 {true, true, true,}};
+	
+	
 	@Before
 	public void initTest()
 	{
-		//initGoodToGoMatrix();
 	}
+	
+	
 	
 	
 	void initGoodToGoMatrix(int rows, int cols)
@@ -42,6 +61,29 @@ public class BoardProcessorTest {
 		board = new Tile[rows][cols];
 		results = new boolean[2][rows][cols];
 	}
+	
+
+	void initBoardWithData(int rows, int cols)
+	{
+		initialField = new boolean[rows][cols];
+		for (int i =0; i < rows; i++)
+		{
+			for (int j=0; j<cols; j++)
+			{
+				if ((i+j)%2 ==0)
+				{
+					initialField[i][j] = true;
+				}
+				else
+				{
+					initialField[i][j] = false;
+				}
+			}
+		}
+		
+		board = new Tile[rows][cols];
+		results = new boolean[2][rows][cols];
+	}
 
 	@Test
 	public void testBoardProcessor() {
@@ -53,10 +95,7 @@ public class BoardProcessorTest {
 		assertTrue(bp instanceof BoardProcessor);
 	}
 
-	@Test
-	public void testRun() {
-		fail("Not yet implemented");
-	}
+	
 
 	@Test
 	public void testCheckOnNeighbors() {
@@ -148,7 +187,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 							
-								bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits, vsplits, 1);
 								bp.initializeBorders();
 								assertNotEquals(0, bp.miniBoardHeight);
 								assertNotEquals(0, bp.miniBoardWidth);
@@ -239,7 +278,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, hsplits, vsplits, 1);
 								bp.initializeSafeZone();
 								assertNotEquals(0, bp.miniBoardHeight);
 								assertNotEquals(0, bp.miniBoardWidth);
@@ -290,7 +329,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits, vsplits,1);
 								bp.initializeBorders();
 								bp.initializeSafeZone();
 								assertNotEquals(0, bp.miniBoardHeight);
@@ -410,7 +449,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits,vsplits, 1);
 								bp.initializeBorders();
 								bp.initializeSafeZone();
 								Coordinate c;
@@ -459,7 +498,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits, vsplits,1);
 								bp.initializeBorders();
 								bp.initializeSafeZone();
 								Coordinate c;
@@ -524,10 +563,7 @@ public class BoardProcessorTest {
 		}
 	}
 
-	@Test
-	public void testProcessTile() {
-		fail("Not yet implemented");
-	}
+	
 
 	@Test
 	public void testGetSetTileState() {
@@ -548,7 +584,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits,vsplits, 1);
 								bp.initializeBorders();
 								bp.initializeSafeZone();
 								Coordinate c;
@@ -594,7 +630,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits, vsplits, 1);
 								bp.initializeBorders();
 								bp.initializeSafeZone();								
 							}
@@ -605,7 +641,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results,  hsplits, vsplits, 1);
 								Coordinate c;
 								for (int i = bp.topLeft.getX(); i< bp.topLeft.getX()+ bp.getMiniboardHeight(); i++)
 								{
@@ -659,7 +695,7 @@ public class BoardProcessorTest {
 							for (int n = 0; n < hsplits; n++)
 							{
 								
-								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, vsplits, hsplits, 1);
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, hsplits,vsplits, 1);
 								bp.initializeBorders();
 								bp.initializeSafeZone();
 								Queue<Coordinate> copyReadyQueue = ((ArrayDeque<Coordinate>)bp.readyQueue).clone();
@@ -677,6 +713,10 @@ public class BoardProcessorTest {
 								
 								bp.readyQueue.clear();
 								bp.bordersReadyQueue.clear();
+								
+
+								assertEquals(0, bp.readyQueue.size());
+								assertEquals(0, bp.bordersReadyQueue.size());
 
 								for (int i = bp.topLeft.getX(); i< bp.topLeft.getX()+ bp.getMiniboardHeight(); i++)
 								{
@@ -718,13 +758,248 @@ public class BoardProcessorTest {
 
 	@Test
 	public void testMakeNotReady() {
-		fail("Not yet implemented");
+		for (int rows = 1; rows < 10; rows ++)
+		{
+			for (int cols = 1; cols < 10; cols ++)
+			{
+							
+				for (int vsplits = 1; vsplits <= rows; vsplits++)
+				{
+					for (int hsplits = 1; hsplits <= cols; hsplits ++)
+					{
+						initBoard(rows, cols);
+						initGoodToGoMatrix(vsplits,hsplits);
+						
+						for (int m = 0; m < vsplits; m ++)
+						{
+							for (int n = 0; n < hsplits; n++)
+							{
+								
+								BoardProcessor bp = new BoardProcessor(m, n, goodToGoMatrix, board, initialField, results, hsplits,vsplits,  1);
+								bp.initializeBorders();
+								bp.initializeSafeZone();
+								Queue<Coordinate> copyReadyQueue = ((ArrayDeque<Coordinate>)bp.readyQueue).clone();
+								Queue<Coordinate> copyBorderReadyQueue = ((ArrayDeque<Coordinate>)bp.bordersReadyQueue).clone();
+								
+								assertEquals(copyReadyQueue.size(), bp.readyQueue.size());
+								assertEquals(copyBorderReadyQueue.size(), bp.bordersReadyQueue.size());
+								
+								
+								
+								while (!bp.readyQueue.isEmpty())
+								{
+									Coordinate c = bp.getNextReadyTile();
+									bp.makeNotReady(c);
+								}
+								
+								assertEquals(0, bp.readyQueue.size());
+								assertEquals(copyReadyQueue.size(), bp.notReadyQueue.size());
+								
+								while (!bp.bordersReadyQueue.isEmpty())
+								{
+									Coordinate c = bp.getNextReadyTile();
+									bp.makeNotReady(c);
+								}
+
+
+								
+								
+								assertEquals(0, bp.bordersReadyQueue.size());
+								
+								assertEquals(copyBorderReadyQueue.size(), bp.bordersNotReadyQueue.size());
+								
+								
+								for (Coordinate c : copyReadyQueue)
+								{
+									assertTrue(bp.notReadyQueue.contains(c));
+								}
+								for (Coordinate c: copyBorderReadyQueue)
+								{
+									assertTrue(bp.bordersNotReadyQueue.contains(c));
+								}
+								
+							}
+						}
+																					
+					}
+				}
+				
+			}
+		}
 	}
 	
 	@Test
 	public void testActivateGameLogic()
 	{
-		fail("Not yet implemented");
+		initGoodToGoMatrix(1, 1);
+		initBoard(3,3);
+		BoardProcessor bp = new BoardProcessor(0, 0, goodToGoMatrix, board, initialField, results, 1, 1, 1);
+		bp.initializeBorders();
+		bp.initializeSafeZone();
+		while (bp.finished.size()!=9)
+		{
+			bp.processTile(bp.getNextReadyTile());
+		}
+		for (int i=0; i<3; i++)
+		{
+			for (int j=0; j<3; j++)
+			{
+				Tile tile = board[i][j];
+				assertEquals(tile.getAge(), 1);
+				assertFalse(tile.getState());
+				assertFalse(tile.getPreviousState());
+				
+			}
+		}
+		
+		
+		initGoodToGoMatrix(1, 1);
+		initBoard(3,3);
+		for (int i=0; i<3; i++)
+		{
+			for (int j=0; j<3; j++)
+			{
+				initialField[i][j] = true;
+				
+			}
+		}
+		bp = new BoardProcessor(0, 0, goodToGoMatrix, board, initialField, results, 1, 1, 1);
+		bp.initializeBorders();
+		bp.initializeSafeZone();
+		while (bp.finished.size()!=9)
+		{
+			bp.processTile(bp.getNextReadyTile());
+		}
+		for (int i=0; i<3; i++)
+		{
+			for (int j=0; j<3; j++)
+			{
+				Tile tile = board[i][j];
+				assertEquals(tile.getAge(), 1);
+				assertEquals(tile.getState(), false);
+				assertEquals(tile.getPreviousState(), true);
+					
+				
+				
+			}
+		}
+		
+		initGoodToGoMatrix(1, 1);
+		initBoard(3,3);
+		initialField = initiailFeild1;
+		bp = new BoardProcessor(0, 0, goodToGoMatrix, board, initialField, results, 1, 1, 1);
+		bp.initializeBorders();
+		bp.initializeSafeZone();
+		while (bp.finished.size()!=9)
+		{
+			bp.processTile(bp.getNextReadyTile());
+		}
+		for (int i=0; i<3; i++)
+		{
+			for (int j=0; j<3; j++)
+			{
+				Tile tile = board[i][j];
+				assertEquals(tile.getAge(), 1);
+				assertEquals(tile.getState(), finalFeild1[i][j]);
+				assertEquals(tile.getPreviousState(), initiailFeild1[i][j]);
+					
+				
+				
+			}
+		}
+		
+		initGoodToGoMatrix(1, 1);
+		initBoard(3,3);
+		initialField = initialFeild2;
+		bp = new BoardProcessor(0, 0, goodToGoMatrix, board, initialField, results, 1, 1, 1);
+		bp.initializeBorders();
+		bp.initializeSafeZone();
+		while (bp.finished.size()!=9)
+		{
+			bp.processTile(bp.getNextReadyTile());
+		}
+		for (int i=0; i<3; i++)
+		{
+			for (int j=0; j<3; j++)
+			{
+				Tile tile = board[i][j];
+				assertEquals(tile.getAge(), 1);
+				assertEquals(tile.getState(), finalFeild2[i][j]);
+				assertEquals(tile.getPreviousState(), initialFeild2[i][j]);
+					
+				
+				
+			}
+		}
+		
+		
+		initGoodToGoMatrix(1, 1);
+		initBoard(3,3);
+		initialField = initialFeild2;
+		bp = new BoardProcessor(0, 0, goodToGoMatrix, board, initialField, results, 1, 1, 2);
+		bp.initializeBorders();
+		bp.initializeSafeZone();
+		while (bp.finished.size()!=9)
+		{
+			bp.processTile(bp.getNextReadyTile());
+		}
+		for (int i=0; i<3; i++)
+		{
+			for (int j=0; j<3; j++)
+			{
+				Tile tile = board[i][j];
+				assertEquals(tile.getAge(), 2);
+				assertEquals(tile.getState(), false);
+				assertEquals(tile.getPreviousState(), true);
+					
+				
+				
+			}
+		}
+		
+	}
+	
+	
+	@Test
+	public void testRun() {
+		for (int rows = 1; rows < 10; rows ++)
+		{
+			for (int cols = 1; cols < 10; cols ++)
+			{
+				int generations;
+				for (generations=1; generations <=9; generations ++)
+				{
+					
+					initBoardWithData(rows, cols);
+					initGoodToGoMatrix(1,1);
+					System.err.println("new board " + " generations = " + generations);
+					GameOfLife sGol=new SerialGameOfLife();
+					
+					boolean[][][] resultSerial=sGol.invoke(initialField,1,1, generations);
+
+					BoardProcessor bp = new BoardProcessor(0, 0, goodToGoMatrix, board, initialField, results, 1, 1, generations);
+					bp.run();
+					
+					
+					
+					for (int i=0; i<2; i++)
+					{
+						for (int j =0; j<rows; j++)
+						{
+							for (int k =0; k<cols; k++)
+							{
+								assertEquals(i + ", " + j + ", " + k, results[i][j][k],resultSerial[i][j][k] );
+							}
+						}
+					}
+					
+					
+					
+				}
+				
+				
+			}
+		}
 	}
 
 }

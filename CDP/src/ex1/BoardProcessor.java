@@ -136,9 +136,9 @@ public class BoardProcessor implements Runnable
 							Tile[][] gameBoard,
 							boolean[][] initialField,							
 							boolean[][][] resultsBoards,
-							
-							int vSplit,
 							int hSplit,
+							int vSplit,
+							
 							
 							int inputGenerations
 							)
@@ -203,6 +203,7 @@ public class BoardProcessor implements Runnable
 			while(checkOnNeighbors() == false)
 			{
 				try {
+					//conditionsMatrix.wait();
 					wait();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
@@ -434,28 +435,17 @@ public class BoardProcessor implements Runnable
 	{
 		Tile tile = board[coordinate.getX()][coordinate.getY()];
 		
-		//do the stuff
-		int counter = 0;
-		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
+		if (tile.isReadyToProcess()==false)
 		{
-			
-			
-			boolean state = getTileState(neighborCoordinate, tile.getAge());
-			if (state == true)
-			{
-				counter++;
-			}
-			
+			makeNotReady(coordinate);
+			return;
 		}
 		
-		//game's logic
+		
+		activateGameLogic(tile);
 		
 		
-		activateGameLogic(tile,counter);
-		
-		
-		//TODO:implement!!!
-		
+	
 		
 		
 		
@@ -481,19 +471,75 @@ public class BoardProcessor implements Runnable
 	
 	
 	
-	void activateGameLogic(Tile tile, int counter) 
+	void activateGameLogic(Tile tile) 
 	{
+		
+		Coordinate tileCoordinate = tile.getCoordinate();
+		System.err.println("calculation for tile  " + tile.getCoordinate().toString() + " state = " + tile.getState());
+		
+		int counter=0;
+		
+		if (tile.getState() == true)
+		{
+			counter = -1;
+		}
+		for (int i=(tileCoordinate.getX()-1 + boardHeight); i<(tileCoordinate.getX()+2 + boardHeight); ++i){
+			for (int j=(tileCoordinate.getY()-1 + boardWidth); j<(tileCoordinate.getY()+2 + boardWidth); j++) {
+				
+				int x = i% boardHeight;
+				int y = j % boardWidth;
+				
+				
+				/*
+				if (x==tileCoordinate.getX() && y == tileCoordinate.getY())
+				{
+					continue;
+				}
+				*/
+				
+				Coordinate neighborCoordinate = new Coordinate(x,y);
+				boolean state = getTileState(neighborCoordinate, tile.getAge());
+			//	System.err.println("in neighbor " + neighborCoordinate.toString() + "state = " + state);
+				if (state == true)
+				{
+					counter++;
+				}
+				
+				//counter+=(field[i%field.length][j%field[0].length]?1:0);
+			}
+		}
+		/*
+		int counter = 0;
+		
+		System.err.println("calculation for tile  " + tile.getCoordinate().toString());
+		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
+		{
+			
+			
+			boolean state = getTileState(neighborCoordinate, tile.getAge());
+			System.err.println("in neighbor " + neighborCoordinate.toString() + "state = " + state);
+			if (state == true)
+			{
+				counter++;
+			}
+			
+		}
+		*/
+		System.err.println("setting tile state, counter = " + counter);
 		if (tile.getState() == false && counter == 3)
 		{
+			System.err.println("to true");
 			setTileState(tile, true);
 		}
 		else 
 			if (tile.getState() == true && (counter == 3 || counter == 2 ))
 			{
-			//do nothing
+				System.err.println("to true");
+				setTileState(tile, true);
 			}
 			else
 			{
+				System.err.println("to false");
 				setTileState(tile, false);
 			}
 		
@@ -600,6 +646,13 @@ public class BoardProcessor implements Runnable
 				bordersNotReadyQueue.remove(readyTileCoordinate);
 				bordersReadyQueue.add(readyTileCoordinate);
 			}
+			else
+			{
+				if (!bordersReadyQueue.contains(readyTileCoordinate))
+				{
+					bordersReadyQueue.add(readyTileCoordinate);
+				}
+			}
 		}
 		else
 		{
@@ -608,6 +661,13 @@ public class BoardProcessor implements Runnable
 			{
 				notReadyQueue.remove(readyTileCoordinate);
 				readyQueue.add(readyTileCoordinate);
+			}
+			else
+			{
+				if (!readyQueue.contains(readyTileCoordinate))
+				{
+					readyQueue.add(readyTileCoordinate);
+				}
 			}
 		}
 	}
@@ -629,7 +689,7 @@ public class BoardProcessor implements Runnable
 		else
 		{
 
-			if (notReadyQueue.contains(notReadyTileCoordinate))
+			if (!notReadyQueue.contains(notReadyTileCoordinate))
 			{
 				notReadyQueue.add(notReadyTileCoordinate);
 

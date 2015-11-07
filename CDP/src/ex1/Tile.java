@@ -66,10 +66,13 @@ public class Tile
 		{
 			for(int j = y - 1 + boardWidth; j < y + 2 + boardWidth; j++)
 			{
+				
+				/*
 				if(i % boardHeight == x && j % boardWidth == y)
 				{
 					continue;
 				}
+				*/
 				Coordinate c = new Coordinate(i % boardHeight,j % boardWidth);
 				neighborsAgesMap.put(c,0);
 			}
