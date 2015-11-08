@@ -212,7 +212,7 @@ public class BoardProcessor implements Runnable
 				}
 			}
 		}	
-		//System.err.println(Thread.currentThread().getId() + " after wait" );
+	//	System.err.println(Thread.currentThread().getId() + " after wait" );
 		initializeSafeZone();
 		
 		while(finished.size()<miniBoardHeight*miniBoardWidth)
@@ -369,7 +369,7 @@ public class BoardProcessor implements Runnable
 		//System.err.println(Thread.currentThread().getId() + " getting next ready tile in notReadyQueue " + notReadyQueue.size() );
 		for(Coordinate coordinate : notReadyQueue)
 		{
-			if (board[coordinate.getX()][coordinate.getX()].isReadyToProcess()==true)
+			if (board[coordinate.getX()][coordinate.getY()].isReadyToProcess()==true)
 			{
 				tmpCoordinate = coordinate;
 				break;
@@ -394,7 +394,7 @@ public class BoardProcessor implements Runnable
 					Tile t = board[c.getX()][c.getY()];
 					if (t==null)
 					{
-						System.err.println("Tile is null in coordiante " + c.toString() + " board size is " + boardHeight + " X " + boardWidth);
+						//System.err.println("Tile is null in coordiante " + c.toString() + " board size is " + boardHeight + " X " + boardWidth);
 					}
 					
 					
@@ -552,14 +552,14 @@ public class BoardProcessor implements Runnable
 		
 		
 		Tile tile = board[coordinate.getX()][coordinate.getY()];
-		
+		/*
 		if (tile.isReadyToProcess()==false)
 		{
 			//System.err.println(Thread.currentThread().getId() + " adde tile " + coordinate.toString() +   " to not ready from proces tile"  );
 			makeNotReady(coordinate);
 			return;
 		}
-		
+		*/
 		
 		activateGameLogic(tile);
 		
