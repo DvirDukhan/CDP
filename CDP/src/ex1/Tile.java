@@ -3,6 +3,7 @@ package ex1;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
@@ -48,6 +49,10 @@ public class Tile
 	 */
 	HashMap<Coordinate, Integer> neighborsAgesMap = new HashMap<Coordinate, Integer>();
 
+	/**
+	 * This queue will hold the coordinates of all the Tiles not ready to be processed in the borders.
+	 */
+    Queue<Coordinate> bordersNotReadyQueue;
 	
 	/**
 	 * 
@@ -59,10 +64,10 @@ public class Tile
 	 * @param boardHeight - The height of the board.
 	 * @param boardWidth - The width of the board.
 	 */
-	public Tile (int x, int y, Boolean inputState, int boardHeight, int boardWidth)
+	public Tile (int x, int y, Boolean inputState, int boardHeight, int boardWidth, Queue<Coordinate> inputBordersNotReadyQueue)
 	{
 		
-
+		bordersNotReadyQueue = inputBordersNotReadyQueue;
 		coordinate = new Coordinate(x, y);
 		state = inputState;
 		for (int i = x - 1 + boardHeight ; i < x + 2 + boardHeight; i++)
