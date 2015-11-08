@@ -600,7 +600,11 @@ public class BoardProcessor implements Runnable
 					 neighbor.updateNeighborAge(currentTileCoordinate, currentTileAge);			
 					 
 				}
-				neighbor.bordersNotReadyQueue.notifyAll();
+				if (neighbor.isReadyToProcess())
+				{
+					neighbor.bordersNotReadyQueue.notifyAll();
+				}
+				
 				
 			}
 			return;
@@ -768,21 +772,7 @@ public class BoardProcessor implements Runnable
 	}
 	
 	
-	void refreshTile(Tile t)
-	{
-		for (Coordinate c : t.neighborsAgesMap.keySet())
-		{
-			Tile neighbor = board[c.getX()][c.getY()];
-			int nAge =0;
-			synchronized(neighbor)
-			{
-				nAge = neighbor.getAge();
-			}
-			
-			t.neighborsAgesMap.put(c, nAge);
-		}
-		
-	}
+
 	
 	
 	

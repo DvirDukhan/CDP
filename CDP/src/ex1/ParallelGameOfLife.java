@@ -1,6 +1,6 @@
 package ex1;
 
-import java.util.TreeSet;
+
 
 /**
  * 
@@ -12,48 +12,10 @@ public class ParallelGameOfLife implements GameOfLife {
 	
 	
 	/**
-	 * Represents the board's height.
-	 */
-	int boardHeight;
-	
-	
-	/**
-	 * Represents the number of vertical splits.
-	 */
-	int verticalSplits;
-		
-	
-	/**
-	 * Represents the board's width.
-	 */
-	int boardWidth;
-	
-	/**
-	 * Represents the number of horizontal splits
-	 */
-	int horizontalSplit;
-	
-	
-	/**
-	 * Results board for maximum generation states.
-	 */
-	boolean[][] maxGenBoard;
-	
-	/**
-	 * Results board for maximum generation -1 states.
-	 */
-	boolean[][] maxGenMinusOneBoard;
-	
-	/**
 	 * The actual game board.
 	 */
 	Tile[][] board;
 	
-	
-	/**
-	 * The input board.
-	 */
-	boolean[][] inputBoard;
 	
 	/**
 	 * The board processors matrix.
@@ -113,34 +75,6 @@ public class ParallelGameOfLife implements GameOfLife {
 
 		return results;
 		
-		
-		
-		/*
-		boardHeight = initalField.length;
-		boardHeight = initalField[0].length;
-		maxGenBoard = new boolean[boardHeight][boardWidth];
-		maxGenMinusOneBoard = new boolean[boardHeight][boardWidth];
-		board = new Tile[boardHeight][boardWidth];
-		inputBoard = initalField;
-		
-		bordersInitialize();
-		
-		//prepare data for spawn
-		//TEST
-		
-		
-		//spawn
-		
-		
-		
-		
-		//retrun something
-		return null;
-		*/
 	}
-	
-
-	
-
 
 }
