@@ -365,7 +365,58 @@ public class BoardProcessor implements Runnable
 		
 		
 		
+		
 		Coordinate tmpCoordinate = null;
+		synchronized(bordersNotReadyQueue)
+		{
+			while (tmpCoordinate == null)
+			{
+				
+				for(Coordinate c : bordersNotReadyQueue)
+				{
+					Tile t = board[c.getX()][c.getY()];
+					if (t==null)
+					{
+						//System.err.println("Tile is null in coordiante " + c.toString() + " board size is " + boardHeight + " X " + boardWidth);
+					}
+					
+					
+					
+					boolean state;
+					synchronized(t)
+					{
+						state = t.isReadyToProcess();
+					}
+
+					if (state ==true)
+					{
+						tmpCoordinate = c;
+						break;
+					}
+					//refreshTile(t);
+					
+				}
+				if (tmpCoordinate!= null)
+				{
+					bordersNotReadyQueue.remove(tmpCoordinate);	
+					//System.err.println(Thread.currentThread().getId() + " outside the while loop");
+					//return tmpCoordinate;
+				}
+				else
+				{
+					try {
+						System.err.println(Thread.currentThread().getId() + " is waiting");
+						bordersNotReadyQueue.wait();
+						
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				System.err.println(Thread.currentThread().getId() + " back from wait");
+			
+			}
+			/*
 		//System.err.println(Thread.currentThread().getId() + " getting next ready tile in notReadyQueue " + notReadyQueue.size() );
 		for(Coordinate coordinate : notReadyQueue)
 		{
@@ -385,64 +436,17 @@ public class BoardProcessor implements Runnable
 		{
 			
 			//System.err.println(Thread.currentThread().getId() + " getting next ready tile in bordersNotReadyQueue " + bordersNotReadyQueue.size() );
-			int counter =0;
-			synchronized(bordersNotReadyQueue)
-			{
-				while (tmpCoordinate == null)
-				{
-					
-					for(Coordinate c : bordersNotReadyQueue)
-					{
-						Tile t = board[c.getX()][c.getY()];
-						if (t==null)
-						{
-							//System.err.println("Tile is null in coordiante " + c.toString() + " board size is " + boardHeight + " X " + boardWidth);
-						}
-						
-						
-						
-						boolean state;
-						synchronized(t)
-						{
-							state = t.isReadyToProcess();
-						}
-
-						if (state ==true)
-						{
-							tmpCoordinate = c;
-							break;
-						}
-						//refreshTile(t);
-						
-					}
-					if (tmpCoordinate!= null)
-					{
-						bordersNotReadyQueue.remove(tmpCoordinate);	
-						//System.err.println(Thread.currentThread().getId() + " outside the while loop");
-						//return tmpCoordinate;
-					}
-					else
-					{
-						try {
-							//System.err.println(Thread.currentThread().getId() + " is waiting");
-							bordersNotReadyQueue.wait();
-							
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					//System.err.println(Thread.currentThread().getId() + " back from wait");
-				
-				}
+		
+			
 			}
 			
-			
-			
-			return tmpCoordinate;
+			*/
 			
 			
 		}
+		return tmpCoordinate;
+
+		
 		
 	}
 	
