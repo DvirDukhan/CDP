@@ -75,12 +75,6 @@ public class Tile
 			for(int j = y - 1 + boardWidth; j < y + 2 + boardWidth; j++)
 			{
 				
-				/*
-				if(i % boardHeight == x && j % boardWidth == y)
-				{
-					continue;
-				}
-				*/
 				Coordinate c = new Coordinate(i % boardHeight,j % boardWidth);
 				neighborsAgesMap.put(c,0);
 			}
@@ -169,21 +163,19 @@ public class Tile
 		{
 			if (neighborCoordinate.equals(coordinate))
 			{
-				//System.err.println("neighbor in coordinate " + neighborCoordinate.toString() + "is equal to tile's coordinate " + coordinate.toString());
+				
 				continue;
 			}
 			int neighborAge = neighborsAgesMap.get(neighborCoordinate);
 			if (neighborAge < age)
 			{
-				//System.err.println("neighbor in coordinate " + neighborCoordinate.toString() + " age = " + neighborAge + 
-				//	"\nthis coordiante " + coordinate.toString() + " age = " + age);
+				
 				return false;
 			}
 			
 			if (neighborAge > age+1)
 			{	
-				System.err.println("neighbor in coordinate " + neighborCoordinate.toString() + " age = " + neighborAge + 
-						"\nthis coordiante " + coordinate.toString() + " age = " + age);
+				
 				return false;
 			}
 		}

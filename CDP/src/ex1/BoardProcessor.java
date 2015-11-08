@@ -199,27 +199,28 @@ public class BoardProcessor implements Runnable
 	public void run()
 	{
 		initializeBorders();
+		initializeSafeZone();
 		synchronized (conditionsMatrix)
 		{
 			while(checkOnNeighbors() == false)
 			{
 				try {
 					conditionsMatrix.wait();
-					//wait();
+
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+	
 					e.printStackTrace();
 				}
 			}
 		}	
-	//	System.err.println(Thread.currentThread().getId() + " after wait" );
-		initializeSafeZone();
+	
+		
 		
 		while(finished.size()<miniBoardHeight*miniBoardWidth)
 		{
 			processTile(getNextReadyTile());
 		}	
-		//System.err.println(Thread.currentThread().getId() + " end run" );
+
 	}
 	
 	/**
@@ -268,7 +269,7 @@ public class BoardProcessor implements Runnable
 			if (!bordersReadyQueue.contains(c))
 			{
 				bordersReadyQueue.add(c);
-				//System.err.println(Thread.currentThread().getId() + " initializing in border 1 " + i + " " + j );
+
 			}
 			
 			
@@ -281,7 +282,7 @@ public class BoardProcessor implements Runnable
 			if (!bordersReadyQueue.contains(c))
 			{
 				bordersReadyQueue.add(c);
-				//System.err.println(Thread.currentThread().getId() + " initializing in border 2" + i + " " + j );
+
 			}
 		}
 		
@@ -296,7 +297,7 @@ public class BoardProcessor implements Runnable
 			if (!bordersReadyQueue.contains(c))
 			{
 				bordersReadyQueue.add(c);
-				//System.err.println(Thread.currentThread().getId() + " initializing in border 3" + i + " " + j );
+
 			}
 			
 			i+=miniBoardHeight-1;
@@ -307,7 +308,7 @@ public class BoardProcessor implements Runnable
 			if (!bordersReadyQueue.contains(c))
 			{
 				bordersReadyQueue.add(c);
-				//System.err.println(Thread.currentThread().getId() + " initializing in border 4" + i + " " + j );
+
 			}
 		}
 		
@@ -336,7 +337,7 @@ public class BoardProcessor implements Runnable
 				if (!readyQueue.contains(c))
 				{
 					readyQueue.add(new Coordinate(i,j));
-					//System.err.println(Thread.currentThread().getId() + " initializing in safe zone " + i + " " + j );
+
 				}
 				
 				
@@ -351,12 +352,12 @@ public class BoardProcessor implements Runnable
 	 */
 	Coordinate getNextReadyTile()
 	{
-		//System.err.println(Thread.currentThread().getId() + " getting next ready tile in readyQueue " + readyQueue.size() );
+
 		if (readyQueue.isEmpty()!= true)
 		{
 			return readyQueue.poll();
 		}
-		//System.err.println(Thread.currentThread().getId() + " getting next ready tile in bordersReadyQueue " + bordersReadyQueue.size() );
+
 		if (bordersReadyQueue.isEmpty()!= true)
 		{
 			return bordersReadyQueue.poll();
@@ -375,13 +376,7 @@ public class BoardProcessor implements Runnable
 				for(Coordinate c : bordersNotReadyQueue)
 				{
 					Tile t = board[c.getX()][c.getY()];
-					if (t==null)
-					{
-						//System.err.println("Tile is null in coordiante " + c.toString() + " board size is " + boardHeight + " X " + boardWidth);
-					}
-					
-					
-					
+				
 					boolean state;
 					synchronized(t)
 					{
@@ -399,50 +394,23 @@ public class BoardProcessor implements Runnable
 				if (tmpCoordinate!= null)
 				{
 					bordersNotReadyQueue.remove(tmpCoordinate);	
-					//System.err.println(Thread.currentThread().getId() + " outside the while loop");
-					//return tmpCoordinate;
+
 				}
 				else
 				{
 					try {
-						System.err.println(Thread.currentThread().getId() + " is waiting");
+
 						bordersNotReadyQueue.wait();
 						
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
+
 						e.printStackTrace();
 					}
 				}
-				System.err.println(Thread.currentThread().getId() + " back from wait");
+
 			
 			}
-			/*
-		//System.err.println(Thread.currentThread().getId() + " getting next ready tile in notReadyQueue " + notReadyQueue.size() );
-		for(Coordinate coordinate : notReadyQueue)
-		{
-			if (board[coordinate.getX()][coordinate.getY()].isReadyToProcess()==true)
-			{
-				tmpCoordinate = coordinate;
-				break;
-			}
-			
-		}
-		if (tmpCoordinate != null)
-		{
-			notReadyQueue.remove(tmpCoordinate);
-			return tmpCoordinate;
-		}
-		else
-		{
-			
-			//System.err.println(Thread.currentThread().getId() + " getting next ready tile in bordersNotReadyQueue " + bordersNotReadyQueue.size() );
-		
-			
-			}
-			
-			*/
-			
-			
+						
 		}
 		return tmpCoordinate;
 
@@ -483,15 +451,6 @@ public class BoardProcessor implements Runnable
 		{
 			return true;
 		}
-		/*
-		if (coordinate.getX() == (topLeft.getX() -1 + boardHeight) % boardHeight ||
-			coordinate.getX() == (topLeft.getX()+miniBoardHeight + boardHeight) % boardHeight||
-			coordinate.getY() == (topLeft.getY()-1 + boardWidth) % boardWidth ||
-			coordinate.getY() == (topLeft.getY()+miniBoardWidth + boardWidth) % boardWidth)
-			return true;
-		
-		return false;
-		*/
 	}
 	
 	
@@ -511,22 +470,9 @@ public class BoardProcessor implements Runnable
 		
 		
 		Tile tile = board[coordinate.getX()][coordinate.getY()];
-		/*
-		if (tile.isReadyToProcess()==false)
-		{
-			//System.err.println(Thread.currentThread().getId() + " adde tile " + coordinate.toString() +   " to not ready from proces tile"  );
-			makeNotReady(coordinate);
-			return;
-		}
-		*/
-		
-		activateGameLogic(tile);
-		
-		
 	
-		
-		
-		
+		activateGameLogic(tile);
+
 		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
 		{
 			updateAgeAtNeighbor(tile.getCoordinate(), neighborCoordinate, tile.getAge());
@@ -538,12 +484,9 @@ public class BoardProcessor implements Runnable
 			results[0][coordinate.getX()][coordinate.getY()] = tile.getPreviousState();
 			results[1][coordinate.getX()][coordinate.getY()] = tile.getState();
 			finished.add(tile.getCoordinate());
-			//while(true)
-			//System.err.println(Thread.currentThread().getId() + " finished  "  + tile.getCoordinate().toString() + " Age " + tile.getAge() );
 		}
 		else
 		{
-			//System.err.println(Thread.currentThread().getId() + " moving tile " + tile.getCoordinate().toString() + " Age " + tile.getAge() +  " to not ready"  );
 			makeNotReady(tile.getCoordinate());
 			
 		}	
@@ -557,7 +500,6 @@ public class BoardProcessor implements Runnable
 	{
 		
 		Coordinate tileCoordinate = tile.getCoordinate();
-		//System.err.println("calculation for tile  " + tile.getCoordinate().toString() + " state = " + tile.getState());
 		
 		int counter=0;
 		
@@ -569,59 +511,28 @@ public class BoardProcessor implements Runnable
 			for (int j=(tileCoordinate.getY()-1 + boardWidth); j<(tileCoordinate.getY()+2 + boardWidth); j++) {
 				
 				int x = i% boardHeight;
-				int y = j % boardWidth;
-				
-				
-				/*
-				if (x==tileCoordinate.getX() && y == tileCoordinate.getY())
-				{
-					continue;
-				}
-				*/
-				
+				int y = j % boardWidth;				
 				Coordinate neighborCoordinate = new Coordinate(x,y);
 				boolean state = getTileState(neighborCoordinate, tile.getAge());
-			//	System.err.println("in neighbor " + neighborCoordinate.toString() + "state = " + state);
 				if (state == true)
 				{
 					counter++;
 				}
 				
-				//counter+=(field[i%field.length][j%field[0].length]?1:0);
 			}
 		}
-		/*
-		int counter = 0;
-		
-		System.err.println("calculation for tile  " + tile.getCoordinate().toString());
-		for (Coordinate neighborCoordinate: tile.getNeighborsCoordinate())
-		{
-			
-			
-			boolean state = getTileState(neighborCoordinate, tile.getAge());
-			System.err.println("in neighbor " + neighborCoordinate.toString() + "state = " + state);
-			if (state == true)
-			{
-				counter++;
-			}
-			
-		}
-		*/
-		//System.err.println("setting tile state, counter = " + counter);
+
 		if (tile.getState() == false && counter == 3)
 		{
-			//System.err.println("to true");
 			setTileState(tile, true);
 		}
 		else 
 			if (tile.getState() == true && (counter == 3 || counter == 2 ))
 			{
-				//System.err.println("to true");
 				setTileState(tile, true);
 			}
 			else
 			{
-				//System.err.println("to false");
 				setTileState(tile, false);
 			}
 		
@@ -630,7 +541,7 @@ public class BoardProcessor implements Runnable
 	/**
 	 * 
 	 * @param coordinate - The Tile's coordinate.
-	 * @param age - The Tile's requsted age.
+	 * @param age - The Tile's requested age.
 	 * @return The Tile's state in the given age.
 	 */
 	boolean getTileState(Coordinate coordinate, int age)
@@ -753,14 +664,12 @@ public class BoardProcessor implements Runnable
 			{
 				bordersNotReadyQueue.remove(readyTileCoordinate);
 				bordersReadyQueue.add(readyTileCoordinate);
-				//System.err.println("adding coordinate" + readyTileCoordinate.toString() + " to bordersReadyQueue after it was found in not ready" );
 			}
 			else
 			{
 				if (!bordersReadyQueue.contains(readyTileCoordinate))
 				{
 					bordersReadyQueue.add(readyTileCoordinate);
-					//System.err.println("adding coordinate" + readyTileCoordinate.toString() + " to bordersReadyQueue after it wasnt found in not ready" );
 				}
 			}
 		}
@@ -771,14 +680,12 @@ public class BoardProcessor implements Runnable
 			{
 				notReadyQueue.remove(readyTileCoordinate);
 				readyQueue.add(readyTileCoordinate);
-				//System.err.println("adding coordinate" + readyTileCoordinate.toString() + " to readyQueue after it was found in not ready" );
 			}
 			else
 			{
 				if (!readyQueue.contains(readyTileCoordinate))
 				{
 					readyQueue.add(readyTileCoordinate);
-					//System.err.println("adding coordinate" + readyTileCoordinate.toString() + " to readyQueue after it wasnt found in not ready" );
 				}
 			}
 		}
@@ -796,12 +703,6 @@ public class BoardProcessor implements Runnable
 			if (!bordersNotReadyQueue.contains(notReadyTileCoordinate))
 			{
 				bordersNotReadyQueue.add(notReadyTileCoordinate);
-				//System.err.println(Thread.currentThread().getId() + " adde tile " + notReadyTileCoordinate.toString() +   " to not ready. size of queue " + bordersNotReadyQueue.size() );
-				
-				if (! bordersNotReadyQueue.contains(notReadyTileCoordinate))
-				{
-				//	System.err.println(Thread.currentThread().getId() + " problem with insertion" );
-				}
 			}
 			if (bordersReadyQueue.contains(notReadyTileCoordinate))
 			{
@@ -878,7 +779,6 @@ public class BoardProcessor implements Runnable
 				nAge = neighbor.getAge();
 			}
 			
-			//System.err.println("now updating tile " + t.getCoordinate().toString() + " tile age " + t.getAge() + " with neighbor " + c.toString() + " with age " + nAge);
 			t.neighborsAgesMap.put(c, nAge);
 		}
 		
