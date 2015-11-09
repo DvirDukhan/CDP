@@ -595,12 +595,14 @@ public class BoardProcessor implements Runnable
 		{
 			synchronized(neighbor.bordersNotReadyQueue)
 			{
+				boolean state = false;
 				synchronized ( neighbor)
 				{
-					 neighbor.updateNeighborAge(currentTileCoordinate, currentTileAge);			
+					 neighbor.updateNeighborAge(currentTileCoordinate, currentTileAge);	
+					 state =  neighbor.isReadyToProcess();
 					 
 				}
-				if (neighbor.isReadyToProcess())
+				if (state ==true)
 				{
 					neighbor.bordersNotReadyQueue.notifyAll();
 				}
